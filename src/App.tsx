@@ -1,10 +1,10 @@
+import MainForm from "./components/MainForm.tsx";
+
 function App() {
 
 
     return (
-        <div className='text-3xl font-bold'>
-            vite start
-        </div>
+        <MainForm/>
     )
 }
 
