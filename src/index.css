@@ -4,6 +4,10 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c1a, #1a1229, #2a1e3d, #3b224f, #4d2761);
+  color: white;
+  font-family: "Roboto", serif;
+  font-optical-sizing: auto;
 }
 
 .field__wrapper {
@@ -21,7 +25,7 @@ body {
   border-radius: .25rem;
 
   &:hover {
-    background-color: lightgray;
+    background-color: #3b224f;
   }
 }
 

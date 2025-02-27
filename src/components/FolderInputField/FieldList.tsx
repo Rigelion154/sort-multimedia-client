@@ -10,11 +10,11 @@ interface IInputFieldProps {
 }
 
 const FieldList = ({folderData, getFolderItems}: IInputFieldProps) => {
-    const prevPath = folderData.folderPath.split('/').filter(Boolean);
+    const prevPath = folderData.folderPath.split('\\').filter(Boolean);
 
     const handlePrevFolderClick = async () => {
         if (prevPath.length > 1) {
-            const currentPath = prevPath.slice(0, -1).join('/');
+            const currentPath = prevPath.slice(0, -1).join('\\');
             await getFolderItems(currentPath);
         }
     };

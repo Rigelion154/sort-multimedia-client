@@ -1,9 +1,11 @@
 import {Button} from "@mui/material";
 
 import FolderInputField from "./FolderInputField/FolderInputField.tsx";
+import SideMenu from "./SideMenu/SideMenu.tsx";
 
 const MainForm = () => (
-    <div className='flex flex-col items-center h-screen p-5 gap-3'>
+    <div className='flex flex-col items-center h-screen p-5 gap-3 relative'>
+        <SideMenu/>
         <div className='flex justify-center gap-5 h-[90%] grow'>
             <FolderInputField type='source'/>
             <FolderInputField type='destination'/>
