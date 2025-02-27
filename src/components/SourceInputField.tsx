@@ -64,19 +64,16 @@ const SourceInputField = ({type}: IFolderInputProps) => {
             // Если путь содержит больше одного сегмента (не корневой)
             if (pathParts.length > 1) {
                 // Убираем последний сегмент пути
-                const prevPath = pathParts.slice(0, -1).join('/');
-                console.log('prevPath', prevPath);
+                const prevPath = pathParts.slice(0, -1).join('/') + '/'; // Добавляем слэш в конце
                 await getFolderItems(prevPath);
             } else {
-                // Если это корневой диск (например, "c:"), добавляем слэш в конце
                 const prevPath = pathParts[0] + '/';
-                console.log('prevPath (корневой диск)', prevPath);
                 await getFolderItems(prevPath);
             }
         } else {
             setError('Текущий путь не определен.');
         }
-    }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFolderPath(e.target.value)
