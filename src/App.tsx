@@ -1,11 +1,5 @@
 import MainForm from "./components/MainForm.tsx";
 
-function App() {
-
-
-    return (
-        <MainForm/>
-    )
-}
+const App = () =>  <MainForm/>
 
 export default App
