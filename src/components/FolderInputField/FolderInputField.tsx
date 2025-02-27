@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Alert, Button, TextField} from "@mui/material";
 
 import {EFolderInputType, IFolderData, IFolderError} from "./types";
@@ -18,23 +18,19 @@ const FolderInputField = ({type}: IFolderInputProps) => {
     const [folderData, setFolderData] = useState<IFolderData | null>(null)
     const [error, setError] = useState('')
 
-    const getFolderItems = async (folderPath: string) => {
-        const isSlashed = folderPath.endsWith('/') ? '' : '/'
-        const response = await fetchFolderItems({folderPath: folderPath + isSlashed, type})
+    const getFolderItems = useCallback(async (path: string) => {
+        const isSlashed = path.endsWith('\\') ? '' : '\\';
+        const response = await fetchFolderItems({folderPath: path + isSlashed, type});
 
         if (response.hasErrors) {
-            const errorData = response as IFolderError
-            setFolderData(null)
-            setFolderPath('')
-            setError(errorData.message)
+            setError((response as IFolderError).message);
+            setFolderData(null);
+            setFolderPath('');
+        } else {
+            setFolderData(response as IFolderData);
+            setFolderPath((response as IFolderData).folderPath);
         }
-
-        if (!response.hasErrors) {
-            const data = response as IFolderData
-            setFolderData(data)
-            setFolderPath(data.folderPath)
-        }
-    }
+    }, [type]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFolderPath(e.target.value)
@@ -48,6 +44,12 @@ const FolderInputField = ({type}: IFolderInputProps) => {
         }
     }
 
+    useEffect(() => {
+        if (!folderData) {
+            (async () => await getFolderItems(folderPath))()
+        }
+    }, [folderData, folderPath, getFolderItems])
+
     return (
         <div className='field__wrapper'>
             <div className='flex items-center gap-1'>
@@ -55,6 +57,22 @@ const FolderInputField = ({type}: IFolderInputProps) => {
                     className='flex-grow'
                     size='small'
                     label={PLACEHOLDER} variant="outlined"
+                    autoComplete='off'
+                    sx={{
+                        "& .MuiOutlinedInput-root": {
+                            color: "white",
+                            fontWeight: "bold",
+                            letterSpacing: '1px !important',
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "white",
+                                borderWidth: "2px",
+                            },
+                        },
+                        "& .MuiInputLabel-outlined": {
+                            color: "white",
+                            fontWeight: "bold",
+                        },
+                    }}
                     color='primary'
                     value={folderPath}
                     onChange={handleInputChange}
@@ -72,7 +90,7 @@ const FolderInputField = ({type}: IFolderInputProps) => {
                 </Button>
             </div>
 
-            <div className='grow border border-green-600 rounded-sm p-2 overflow-auto'>
+            <div className='grow border-2 border-white  rounded-sm p-2 overflow-auto'>
                 {error && <Alert severity="warning">{error}</Alert>}
                 {folderData && <FieldList {...{folderData, getFolderItems}} />}
             </div>
