@@ -1,15 +1,14 @@
 import {AxiosError, AxiosResponse} from "axios";
 
-import {EFolderInputType, IFolderError, IFolderData} from "../../components/FolderInputField/types";
+import {IFolderData, IFolderError} from "../../components/FolderInputField/types";
 
 import {apiClient} from "../apiClient.ts";
 
 export interface IFolderItemsRequest {
     folderPath: string,
-    type: keyof typeof EFolderInputType
 }
 
-export const fetchFolderItems = async (data: IFolderItemsRequest): Promise<IFolderData | IFolderError> => {
+export const fetchFolderFiles = async (data: IFolderItemsRequest): Promise<IFolderData | IFolderError> => {
     try {
         const response: AxiosResponse<IFolderData> = await apiClient.post('/sort/path', data);
         return response.data

@@ -1,23 +1,23 @@
-import {List, ListItem} from "@mui/material";
-
-
 const SideMenu = () => {
     return (
-        <div className='fixed start-[30px] top-[20px] w-[350px] border-2 text-white font-bold rounded-md'>
-            <List>
-                <ListItem>
-                    Расширения для фото:
-                </ListItem>
-                <ListItem>
-                    [ 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp' ]
-                </ListItem>
-                <ListItem>
+        <div className='fixed start-[30px] top-[20px] flex flex-col gap-3'>
+            <div className='border-2 text-white font-bold rounded-md p-4'>
+                <span className='me-1'>
+                        Расширения для фото:
+                </span>
+                <span className='text-blue-700'>
+                        [ 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp' ]
+                </span>
+            </div>
+
+            <div className='border-2 text-white font-bold rounded-md p-4'>
+                <span className='me-1'>
                     Расширения для видео:
-                </ListItem>
-                <ListItem>
+                </span>
+                <span className='text-blue-700'>
                     [ 'mp4', 'mov', 'avi', 'mkv', 'webm' ]
-                </ListItem>
-            </List>
+                </span>
+            </div>
         </div>
     );
 };
