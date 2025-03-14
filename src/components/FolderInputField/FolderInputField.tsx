@@ -1,54 +1,54 @@
-import React, {useCallback, useEffect, useState} from "react";
+import {observer} from "mobx-react-lite";
+import React, {useEffect} from "react";
 import {Alert, Button, TextField} from "@mui/material";
 
-import {EFolderInputType, IFolderData, IFolderError} from "./types";
-
 import {DESTINATION_LABEL, SOURCE_LABEL, START_PATH} from "../../constants";
-import {fetchFolderItems} from "../../api/requests/fetchFolderItems.ts";
+import {ESorterPath, sorterStore} from "../../store/SorterStore.ts";
 
 import FieldList from "./FieldList.tsx";
 
 interface IFolderInputProps {
-    type: keyof typeof EFolderInputType
+    pathType: ESorterPath
 }
 
-const FolderInputField = ({type}: IFolderInputProps) => {
-    const PLACEHOLDER = type === 'source' ? SOURCE_LABEL : DESTINATION_LABEL
-    const [folderPath, setFolderPath] = useState<string>(START_PATH)
-    const [folderData, setFolderData] = useState<IFolderData | null>(null)
-    const [error, setError] = useState('')
+const FolderInputField = observer(({pathType}: IFolderInputProps) => {
+    const {
+        sourcePath,
+        destinationPath,
+        sourceData,
+        destinationData,
+        sourceError,
+        destinationError,
+        setFolderError,
+        setPath,
+        getSourceFiles
+    } = sorterStore
+    const folderPath = pathType === ESorterPath.sourcePath ? sourcePath : destinationPath
+    const folderData = pathType === ESorterPath.sourcePath ? sourceData : destinationData
+    const error = pathType === ESorterPath.sourcePath ? sourceError : destinationError
 
-    const getFolderItems = useCallback(async (path: string) => {
-        const isSlashed = path.endsWith('\\') ? '' : '\\';
-        const response = await fetchFolderItems({folderPath: path + isSlashed, type});
-
-        if (response.hasErrors) {
-            setError((response as IFolderError).message);
-            setFolderData(null);
-            setFolderPath('');
-        } else {
-            setFolderData(response as IFolderData);
-            setFolderPath((response as IFolderData).folderPath);
-        }
-    }, [type]);
+    // console.log(folderPath, pathType)
+    // console.log(sourceData, sourceData)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFolderPath(e.target.value)
-        setError('')
+        setPath(pathType, e.target.value)
+        setFolderError(pathType, null)
     }
 
     const handleInputClick = () => {
         if (!folderPath) {
-            setFolderPath(START_PATH)
-            setError('')
+            setPath(pathType, START_PATH)
+            setFolderError(pathType, null)
         }
     }
 
     useEffect(() => {
-        if (!folderData) {
-            (async () => await getFolderItems(folderPath))()
+        if (!folderData && !error) {
+            (async () => {
+                await getSourceFiles(pathType, folderPath)
+            })()
         }
-    }, [folderData, folderPath, getFolderItems])
+    }, [error, folderData, folderPath, getSourceFiles, pathType])
 
     return (
         <div className='field__wrapper'>
@@ -56,7 +56,8 @@ const FolderInputField = ({type}: IFolderInputProps) => {
                 <TextField
                     className='flex-grow'
                     size='small'
-                    label={PLACEHOLDER} variant="outlined"
+                    label={pathType === ESorterPath.sourcePath ? SOURCE_LABEL : DESTINATION_LABEL}
+                    variant="outlined"
                     autoComplete='off'
                     sx={{
                         "& .MuiOutlinedInput-root": {
@@ -80,7 +81,7 @@ const FolderInputField = ({type}: IFolderInputProps) => {
                 />
 
                 <Button
-                    onClick={() => getFolderItems(folderPath)}
+                    onClick={() => getSourceFiles(pathType, folderPath)}
                     className='h-[100%]'
                     variant="contained"
                     color='success'
@@ -91,11 +92,11 @@ const FolderInputField = ({type}: IFolderInputProps) => {
             </div>
 
             <div className='grow border-2 border-white  rounded-sm p-2 overflow-auto'>
-                {error && <Alert severity="warning">{error}</Alert>}
-                {folderData && <FieldList {...{folderData, getFolderItems}} />}
+                {error && <Alert severity="warning">{error.message}</Alert>}
+                {sourceData && <FieldList {...{pathType}} />}
             </div>
         </div>
     );
-};
+});
 
 export default FolderInputField;
