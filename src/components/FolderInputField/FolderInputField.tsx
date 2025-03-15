@@ -1,6 +1,7 @@
 import {observer} from "mobx-react-lite";
 import React, {useEffect} from "react";
-import {Alert, Button, TextField} from "@mui/material";
+import Button from "react-bootstrap/esm/Button";
+import {Alert, FormControl, FormLabel} from "react-bootstrap";
 
 import {DESTINATION_LABEL, SOURCE_LABEL, START_PATH} from "../../constants";
 import {ESorterPath, sorterStore} from "../../store/SorterStore.ts";
@@ -12,23 +13,12 @@ interface IFolderInputProps {
 }
 
 const FolderInputField = observer(({pathType}: IFolderInputProps) => {
-    const {
-        sourcePath,
-        destinationPath,
-        sourceData,
-        destinationData,
-        sourceError,
-        destinationError,
-        setFolderError,
-        setPath,
-        getSourceFiles
-    } = sorterStore
+    const {sourcePath, destinationPath, sourceData, destinationData, sourceError, destinationError,} = sorterStore
+    const {setFolderError, setPath, getSourceFiles} = sorterStore
     const folderPath = pathType === ESorterPath.sourcePath ? sourcePath : destinationPath
     const folderData = pathType === ESorterPath.sourcePath ? sourceData : destinationData
     const error = pathType === ESorterPath.sourcePath ? sourceError : destinationError
 
-    // console.log(folderPath, pathType)
-    // console.log(sourceData, sourceData)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPath(pathType, e.target.value)
@@ -42,6 +32,11 @@ const FolderInputField = observer(({pathType}: IFolderInputProps) => {
         }
     }
 
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        await getSourceFiles(pathType, folderPath)
+    }
+
     useEffect(() => {
         if (!folderData && !error) {
             (async () => {
@@ -52,47 +47,24 @@ const FolderInputField = observer(({pathType}: IFolderInputProps) => {
 
     return (
         <div className='field__wrapper'>
-            <div className='flex items-center gap-1'>
-                <TextField
-                    className='flex-grow'
-                    size='small'
-                    label={pathType === ESorterPath.sourcePath ? SOURCE_LABEL : DESTINATION_LABEL}
-                    variant="outlined"
-                    autoComplete='off'
-                    sx={{
-                        "& .MuiOutlinedInput-root": {
-                            color: "white",
-                            fontWeight: "bold",
-                            letterSpacing: '1px !important',
-                            "& .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "white",
-                                borderWidth: "2px",
-                            },
-                        },
-                        "& .MuiInputLabel-outlined": {
-                            color: "white",
-                            fontWeight: "bold",
-                        },
-                    }}
-                    color='primary'
-                    value={folderPath}
-                    onChange={handleInputChange}
-                    onClick={handleInputClick}
-                />
+            <form onSubmit={handleSubmit}>
+                <FormLabel>
+                    {pathType === ESorterPath.sourcePath ? SOURCE_LABEL : DESTINATION_LABEL}
+                </FormLabel>
+                <div className='d-flex align-items-center gap-1'>
+                    <FormControl className='rounded-1 text-success fw-bold shadow-none' autoComplete='off'
+                                 value={folderPath}
+                                 onClick={handleInputClick}
+                                 onChange={handleInputChange}/>
+                    <Button variant='success' className='rounded-1' disabled={!!error || !folderPath} type='submit'>
+                        Применить
+                    </Button>
+                </div>
+            </form>
 
-                <Button
-                    onClick={() => getSourceFiles(pathType, folderPath)}
-                    className='h-[100%]'
-                    variant="contained"
-                    color='success'
-                    disabled={!!error || !folderPath}
-                >
-                    Применить
-                </Button>
-            </div>
-
-            <div className='grow border-2 border-white  rounded-sm p-2 overflow-auto'>
-                {error && <Alert severity="warning">{error.message}</Alert>}
+            <div className='flex-grow-1 border border-2 border-white rounded-1 p-2 overflow-auto'
+                 style={{maxHeight: '80vh'}}>
+                {error && <Alert variant="warning">{error.message}</Alert>}
                 {sourceData && <FieldList {...{pathType}} />}
             </div>
         </div>

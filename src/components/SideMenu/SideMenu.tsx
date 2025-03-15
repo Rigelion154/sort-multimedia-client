@@ -1,25 +1,16 @@
-const SideMenu = () => {
-    return (
-        <div className='fixed start-[30px] top-[20px] flex flex-col gap-3'>
-            <div className='border-2 text-white font-bold rounded-md p-4'>
-                <span className='me-1'>
-                        Расширения для фото:
-                </span>
-                <span className='text-blue-700'>
-                        [ 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp' ]
-                </span>
-            </div>
+import {sorterStore} from "../../store/SorterStore.ts";
+import {observer} from "mobx-react-lite";
+import ExtensionForm from "./ExtensionForm.tsx";
 
-            <div className='border-2 text-white font-bold rounded-md p-4'>
-                <span className='me-1'>
-                    Расширения для видео:
-                </span>
-                <span className='text-blue-700'>
-                    [ 'mp4', 'mov', 'avi', 'mkv', 'webm' ]
-                </span>
-            </div>
+
+const SideMenu = observer(() => {
+    const {photoExtension, videoExtension, isMenuShow} = sorterStore
+    return (
+        <div className={`${isMenuShow ? 'show' : ''} side__menu shadow-lg`}>
+            <ExtensionForm extensions={photoExtension}/>
+            <ExtensionForm extensions={videoExtension}/>
         </div>
     );
-};
+});
 
 export default SideMenu;

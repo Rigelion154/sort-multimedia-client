@@ -17,26 +17,36 @@ class SorterStore {
     destinationData: IFolderData | null = null
     destinationError: IFolderError | null = null
 
+    photoExtension: string[] = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']
+    videoExtension: string[] = ['mp4', 'mov', 'avi', 'mkv', 'webm']
+
+    isMenuShow = false;
+
     constructor() {
         makeAutoObservable(this);
     }
 
-    public setPath = <P extends ESorterPath>(pathType: P, value: string): void => {
+    menuToggle = () => this.isMenuShow = !this.isMenuShow;
+
+    setExtension = (extension: 'photoExtension' | 'videoExtension', value: string) => this[extension].push(value)
+
+
+    setPath = <P extends ESorterPath>(pathType: P, value: string): void => {
         this[pathType] = value
     }
 
-    public setFolderError = <T extends ESorterPath>(pathType: T, error: IFolderError | null) => {
+    setFolderError = <T extends ESorterPath>(pathType: T, error: IFolderError | null) => {
         const currentError = pathType === ESorterPath.sourcePath ? 'sourceError' : 'destinationError'
         this[currentError] = error
     }
 
-    public setFolderData = <T extends ESorterPath>(pathType: T, data: IFolderData | null) => {
+    setFolderData = <T extends ESorterPath>(pathType: T, data: IFolderData | null) => {
         const currentData = pathType === ESorterPath.sourcePath ? 'sourceData' : 'destinationData'
         this[currentData] = data
     }
 
 
-    public getSourceFiles = async <T extends ESorterPath>(pathType: T, path: string) => {
+    getSourceFiles = async <T extends ESorterPath>(pathType: T, path: string) => {
         const isSlashed = path.endsWith('\\') ? '' : '\\';
         const response = await fetchFolderFiles({folderPath: path + isSlashed});
 
